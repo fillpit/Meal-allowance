@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>食堂补贴导入模板自动生成器</title>
+  <!-- 引入样式表（打包时会被 build.js 自动内嵌） -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="dark-theme">
+  <!-- 背景霓虹渐变光晕 -->
+  <div class="ambient-glow glow-1"></div>
+  <div class="ambient-glow glow-2"></div>
+  <div class="ambient-glow glow-3"></div>
+
+  <div class="app-container">
+    <!-- 顶部状态栏 -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-icon-wrapper">
+          <svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1>食堂补贴导入模板自动生成器</h1>
+          <p class="subtitle">食堂智能管理套件 · 极简高效</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <!-- 作者信息展示区 -->
+        <div class="author-badge" title="开发者：坑飞">
+          <div class="avatar-wrapper">
+            <img src="avatar.png" class="author-avatar" alt="坑飞" onerror="this.style.display='none'; document.getElementById('author-avatar-svg').style.display='block';">
+            <svg id="author-avatar-svg" class="author-avatar" style="display:none;" viewBox="0 0 100 100">
+              <circle cx="50" cy="50" r="45" fill="#a4ce57" />
+              <circle cx="35" cy="35" r="10" fill="#fff" />
+              <circle cx="35" cy="35" r="4" fill="#000" />
+              <circle cx="65" cy="35" r="10" fill="#fff" />
+              <circle cx="65" cy="35" r="4" fill="#000" />
+              <circle cx="25" cy="52" r="5" fill="#f59ba7" />
+              <circle cx="75" cy="52" r="5" fill="#f59ba7" />
+              <path d="M 40 55 Q 50 65 60 55" stroke="#333" stroke-width="4" stroke-linecap="round" fill="none" />
+            </svg>
+          </div>
+          <span class="author-name">坑飞</span>
+        </div>
+
+        <!-- 主题切换按钮 -->
+        <button id="theme-toggle" class="icon-btn" title="切换主题">
+          <!-- 太阳图标 -->
+          <svg class="icon sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"/>
+            <line x1="12" y1="1" x2="12" y2="3"/>
+            <line x1="12" y1="21" x2="12" y2="23"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="1" y1="12" x2="3" y2="12"/>
+            <line x1="21" y1="12" x2="23" y2="12"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          </svg>
+          <!-- 月亮图标 -->
+          <svg class="icon moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="app-content">
+      <!-- 左侧：参数输入与配置区 -->
+      <section class="config-panel">
+        
+        <!-- 1. 人员名单导入卡片 -->
+        <div class="glass-card" id="card-users">
+          <div class="card-header">
+            <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+            <h2>1. 导入人员名单</h2>
+          </div>
+          
+          <div class="tabs">
+            <button class="tab-btn active" data-tab="paste-tab">粘贴名单</button>
+            <button class="tab-btn" data-tab="upload-tab">文件导入</button>
+          </div>
+
+          <div class="tab-content" id="paste-tab">
+            <div class="textarea-wrapper">
+              <textarea id="users-input" placeholder="请在此输入或粘贴账号列表，一行一个账号。&#10;例如：&#10;10001&#10;10002&#10;10003"></textarea>
+              <div class="textarea-badge" id="accounts-count">已识别：0 人</div>
+            </div>
+            <p class="helper-text">💡 支持直接从 Excel 复制一列账号粘贴到此处，会自动去除空格及重复项。</p>
+          </div>
+
+          <div class="tab-content hidden" id="upload-tab">
+            <div class="upload-zone" id="drag-zone">
+              <input type="file" id="file-input" accept=".txt,.csv" class="hidden-file-input">
+              <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/>
+                <line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+              <p class="upload-title">将人员名单拖拽至此，或 <span class="highlight">点击上传</span></p>
+              <p class="upload-limit">支持 .txt / .csv 文件，每行一个账号</p>
+            </div>
+            <div id="file-info" class="file-info-badge hidden">
+              <span class="file-name">filename.txt</span>
+              <button id="clear-file" class="text-danger-btn" title="清除文件">×</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. 补贴时间周期卡片 -->
+        <div class="glass-card" id="card-date">
+          <div class="card-header">
+            <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+              <line x1="16" y1="2" x2="16" y2="6"/>
+              <line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+            <h2>2. 设置补贴日期范围</h2>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="start-date">开始日期</label>
+              <div class="input-with-icon">
+                <input type="date" id="start-date" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="end-date">结束日期</label>
+              <div class="input-with-icon">
+                <input type="date" id="end-date" required>
+              </div>
+            </div>
+          </div>
+
+          <!-- 星期多选卡片区（决定周六日及其他日期的发放情况） -->
+          <div class="form-group margin-top-lg">
+            <div class="flex-justify">
+              <label class="label-with-desc">
+                发放星期选择
+                <span class="desc">（仅在选中的星期几生成补贴，不勾选的日期将自动跳过）</span>
+              </label>
+              <div class="weekday-actions">
+                <button type="button" class="link-btn" id="select-workdays">工作日</button>
+                <button type="button" class="link-btn" id="select-all-days">全选</button>
+              </div>
+            </div>
+            <div class="weekday-grid" id="weekday-selector">
+              <label class="weekday-item checked" data-day="1">
+                <input type="checkbox" value="1" checked class="weekday-checkbox">
+                <span class="day-num">一</span>
+                <span class="day-label">周一</span>
+              </label>
+              <label class="weekday-item checked" data-day="2">
+                <input type="checkbox" value="2" checked class="weekday-checkbox">
+                <span class="day-num">二</span>
+                <span class="day-label">周二</span>
+              </label>
+              <label class="weekday-item checked" data-day="3">
+                <input type="checkbox" value="3" checked class="weekday-checkbox">
+                <span class="day-num">三</span>
+                <span class="day-label">周三</span>
+              </label>
+              <label class="weekday-item checked" data-day="4">
+                <input type="checkbox" value="4" checked class="weekday-checkbox">
+                <span class="day-num">四</span>
+                <span class="day-label">周四</span>
+              </label>
+              <label class="weekday-item checked" data-day="5">
+                <input type="checkbox" value="5" checked class="weekday-checkbox">
+                <span class="day-num">五</span>
+                <span class="day-label">周五</span>
+              </label>
+              <label class="weekday-item" data-day="6">
+                <input type="checkbox" value="6" class="weekday-checkbox">
+                <span class="day-num">六</span>
+                <span class="day-label">周六</span>
+              </label>
+              <label class="weekday-item" data-day="0">
+                <input type="checkbox" value="0" class="weekday-checkbox">
+                <span class="day-num">日</span>
+                <span class="day-label">周日</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. 补贴金额与类型卡片 -->
+        <div class="glass-card" id="card-amount">
+          <div class="card-header">
+            <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="1" x2="12" y2="23"/>
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
+            <h2>3. 补贴规则配置</h2>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="subsidy-amount">补贴金额 (元)</label>
+              <div class="amount-input-group">
+                <span class="currency-symbol">￥</span>
+                <input type="number" id="subsidy-amount" min="0" step="0.01" value="20.00" placeholder="0.00">
+              </div>
+              <div class="quick-amount-chips" id="quick-amounts">
+                <button type="button" class="chip-btn" data-val="10">10元</button>
+                <button type="button" class="chip-btn" data-val="15">15元</button>
+                <button type="button" class="chip-btn active" data-val="20">20元</button>
+                <button type="button" class="chip-btn" data-val="25">25元</button>
+                <button type="button" class="chip-btn" data-val="50">50元</button>
+                <button type="button" class="chip-btn" data-val="100">100元</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group margin-top-md">
+            <label>补贴类型</label>
+            <div class="type-cards-container">
+              <label class="type-card checked">
+                <input type="radio" name="subsidy-type" value="0" checked class="type-radio">
+                <div class="type-card-content">
+                  <div class="type-card-header">
+                    <span class="type-badge-icon accum">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                        <line x1="12" y1="5" x2="12" y2="19"/>
+                        <line x1="5" y1="12" x2="19" y2="12"/>
+                      </svg>
+                    </span>
+                    <h3>累加补贴 (0)</h3>
+                  </div>
+                  <p class="type-desc">补贴金额将直接**累加**到该人员现有的余额账户上。</p>
+                </div>
+              </label>
+
+              <label class="type-card">
+                <input type="radio" name="subsidy-type" value="1" class="type-radio">
+                <div class="type-card-content">
+                  <div class="type-card-header">
+                    <span class="type-badge-icon reset">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                        <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+                      </svg>
+                    </span>
+                    <h3>清零补贴 (1)</h3>
+                  </div>
+                  <p class="type-desc">原账户余额将**先清零**，再直接重置为设定的补贴金额。</p>
+                </div>
+              </label>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- 右侧：实时预览与导出操作区 -->
+      <section class="preview-panel">
+        
+        <!-- 4. 预览与导出主卡片 -->
+        <div class="glass-card fill-height" id="card-preview">
+          <div class="card-header preview-header">
+            <div class="header-left">
+              <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+                <polyline points="10 9 9 9 8 9"/>
+              </svg>
+              <h2>4. 补贴明细实时预览</h2>
+            </div>
+            <!-- 搜索框 -->
+            <div class="search-box">
+              <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+              <input type="text" id="search-input" placeholder="输入账户或日期筛选预览...">
+            </div>
+          </div>
+
+          <!-- 统计指标网格 -->
+          <div class="stats-grid">
+            <div class="stat-card">
+              <span class="stat-num" id="stat-users">0</span>
+              <span class="stat-label">名单人数</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-num" id="stat-days">0</span>
+              <span class="stat-label">发放天数</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-num" id="stat-records">0</span>
+              <span class="stat-label">生成条数</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-num" id="stat-total-amount">￥0.00</span>
+              <span class="stat-label">补贴预计总额</span>
+            </div>
+          </div>
+
+          <!-- 预览表格主体 -->
+          <div class="table-container" id="table-view-container">
+            <!-- 默认空状态 -->
+            <div class="empty-state" id="empty-state-view">
+              <div class="empty-icon-wrapper">
+                <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
+                  <line x1="7" y1="7" x2="7.01" y2="7"/>
+                </svg>
+              </div>
+              <h3>暂无生成的补贴明细</h3>
+              <p>请在左侧：(1) 粘贴/导入账号列表、(2) 设置有效日期、(3) 填写金额，明细将实时在此自动计算生成。</p>
+            </div>
+
+            <!-- 数据表格 -->
+            <table class="preview-table hidden" id="preview-table-el">
+              <thead>
+                <tr>
+                  <th width="15%">账户号</th>
+                  <th width="15%">补贴金额</th>
+                  <th width="15%">补贴类型</th>
+                  <th width="20%">到账时间</th>
+                  <th width="25%">备注</th>
+                  <th width="10%">操作</th>
+                </tr>
+              </thead>
+              <tbody id="preview-tbody">
+                <!-- 动态渲染行 -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- 表格底部及分页/截断提示 -->
+          <div class="table-footer hidden" id="table-footer-el">
+            <span class="table-info-text" id="rows-info-text">正在显示全部 0 条记录</span>
+            <button class="text-danger-btn" id="clear-all-records-btn">清空全部明细</button>
+          </div>
+
+          <!-- 一键导出驱动区域 -->
+          <div class="action-footer">
+            <button id="export-btn" class="export-btn-el" disabled>
+              <svg class="btn-icon animate-bounce" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              一键生成并导出 Excel 模板
+            </button>
+          </div>
+
+        </div>
+
+      </section>
+    </main>
+
+    <!-- 顶层全局消息提示容器 -->
+    <div id="toast-container" class="toast-container"></div>
+  </div>
+
+  <!-- 引入逻辑脚本（打包时会被 build.js 自动内嵌） -->
+  <script src="app.js"></script>
+</body>
+</html>
